@@ -1,0 +1,38 @@
+# Local deployment values — external RDS PostgreSQL, no Redis
+# See LOCAL_DEPLOYMENT.md for full setup instructions.
+#
+# Usage:
+#   helm dependency update charts/prefect-server
+#   helm upgrade --install prefect-server ./charts/prefect-server \
+#     -f charts/prefect-server/local-values.yaml \
+#     --set secret.create=false \
+#     --set secret.name=prefect-server-db-secret \
+#     --namespace rm-dev --wait
+
+# Disable bundled PostgreSQL subchart — using external RDS
+postgresql:
+  enabled: false
+
+# Reference the manually created Kubernetes secret
+# (created via kubectl — see LOCAL_DEPLOYMENT.md Step 2)
+secret:
+  create: false
+  name: prefect-server-db-secret
+
+# Single-replica server
+server:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# No Redis or background services
+redis:
+  enabled: false
+
+backgroundServices:
+  runAsSeparateDeployment: false
